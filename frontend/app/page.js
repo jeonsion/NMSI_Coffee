@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-gray-800">
       <h1 className="text-4xl font-bold flex items-center gap-2">
-        ☕ NMSI IT Team 커피 구매 기록
+        ☕ AI Blue Team 커피 구매 기록
       </h1>
       <p className="text-lg text-gray-600 mt-2">
         커피 구매 기록을 관리하고, 공정하게 순번을 정하는 웹앱입니다.
