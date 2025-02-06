@@ -99,30 +99,36 @@ export default function Users() {
   
   
     // ✅ 결제 기록 추가 (중복 검사 포함)
-  const handleConfirmPayment = async () => {
-    if (!selectedRecord) return;
-
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/coffee`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: selectedUser._id }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setPopupMessage("❌ 오늘 이미 결제한 사람이 있습니다!"); // ✅ 팝업에서 메시지 표시
-        setPaymentSuccess(false);
-        return;
+    const handleConfirmPayment = async () => {
+      if (!selectedUser) return console.error("❌ 오류: 선택된 사용자가 없습니다!");
+  
+      console.log("✅ 결제 요청 시작 - 사용자 ID:", selectedUser._id);
+  
+      try {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/coffee`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ userId: selectedUser._id }),
+          });
+  
+          console.log("✅ 응답 상태 코드:", res.status);
+  
+          const data = await res.json();
+          console.log("✅ 응답 데이터:", data);
+  
+          if (!res.ok) {
+              setPopupMessage("❌ 오늘 이미 결제한 사람이 있습니다!");
+              setPaymentSuccess(false);
+              return;
+          }
+  
+          setPopupMessage(`✅ ${selectedUser.name} 님이 결제자로 등록되었습니다!`);
+          setPaymentSuccess(true);
+      } catch (err) {
+          console.error("❌ 결제 기록 추가 오류:", err);
       }
-
-      setPopupMessage(`✅ ${selectedUser.name} 님이 결제자로 등록되었습니다!`); // ✅ 성공 메시지 변경
-      setPaymentSuccess(true); // ✅ 성공 상태 설정
-    } catch (err) {
-      console.error("결제 기록 추가 오류:", err);
-    }
   };
+  
 
 
   return (

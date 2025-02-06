@@ -73,7 +73,7 @@ export default function Records() {
         {records.length > 0 ? (
           records.map((record) => (
             <li key={record._id} className="p-3 border-b border-gray-300 flex justify-between items-center">
-              <span>{record.userId?.name} 님이 {new Date(record.date).toLocaleDateString()} 에 결제하셨습니다.</span>
+              <span>{record.userName} 님이 {new Date(record.date).toLocaleDateString()} 에 결제하셨습니다.</span>
               <button
                 onClick={() => handleDeleteClick(record)}
                 className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"

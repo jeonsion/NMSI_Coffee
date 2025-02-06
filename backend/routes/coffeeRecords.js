@@ -1,6 +1,7 @@
 const express = require("express");
 const CoffeeRecord = require("../models/CoffeeRecord");
 const moment = require("moment");
+const User = require("../models/User"); // ✅ User 모델 추가
 
 const router = express.Router();
 
@@ -21,6 +22,9 @@ router.post("/", async (req, res) => {
     const { userId } = req.body;
     if (!userId) return res.status(400).json({ error: "사용자 ID가 필요합니다." });
 
+    const user = await User.findById(userId);
+    if (!user) return res.status(400).json({ error: "사용자를 찾을 수 없습니다." });
+
     // ✅ 오늘 날짜의 시작과 끝 범위 설정
     const todayStart = moment().startOf("day").toDate();
     const todayEnd = moment().endOf("day").toDate();
@@ -34,8 +38,13 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "오늘 이미 결제한 사람이 있습니다!" });
     }
 
-    // ✅ 결제 기록 추가
-    const newRecord = new CoffeeRecord({ userId, date: new Date() });
+    // ✅ 결제 기록 추가 
+    const newRecord = new CoffeeRecord({
+      userId: user._id,
+      userName: user.name, // ✅ userName 저장
+      date: new Date(),
+    });    
+    
     await newRecord.save();
 
     res.status(201).json(newRecord);
