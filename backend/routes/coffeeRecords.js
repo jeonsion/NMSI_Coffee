@@ -8,7 +8,7 @@ const router = express.Router();
 // ✅ 모든 커피 구매 기록 조회
 router.get("/", async (req, res) => {
   try {
-    const records = await CoffeeRecord.find().populate("userId");
+    const records = await CoffeeRecord.find().sort({ date: -1 }); // ✅ 내림차순 정렬 추가
     res.json(records);
   } catch (err) {
     console.error("커피 기록 조회 오류:", err);

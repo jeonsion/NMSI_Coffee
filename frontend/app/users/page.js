@@ -28,10 +28,26 @@ export default function Users() {
     fetchUsers();
   }, []);
 
+  const isValidName = (name) => /^[A-Za-z가-힣\s]+$/.test(name);
+
+
   // ✅ 새로운 사용자 추가하기
   const handleAddUser = async () => {
-    if (!name.trim()) return alert("이름을 입력하세요!");
+    if (!name.trim()) {
+      setPopupMessage("이름을 입력하세요!"); // ✅ 팝업 메시지 설정
+      return;
+    }
 
+    if (!isValidName(name)) {
+      setPopupMessage(
+        <>
+          올바른 이름을 입력하세요! (한글 또는 영어만 가능)
+          <br />
+          ex) "이순신", "Kim Minseok"
+        </>
+      );
+            return;
+    }
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, {
         method: "POST",
@@ -46,6 +62,7 @@ export default function Users() {
       setName(""); // 입력 필드 초기화
     } catch (err) {
       console.error("사용자 추가 오류:", err);
+      setPopupMessage("사용자 추가 중 오류가 발생했습니다.");
     }
   };
   
@@ -135,12 +152,12 @@ export default function Users() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-white text-gray-800">
       <h1 className="text-3xl font-bold">👥 사용자 목록</h1>
 
-      {/* ✅ 뒤로가기 버튼 */}
+      {/* 뒤로가기 버튼 */}
       <button
-        onClick={() => router.push("/")} // ✅ 홈으로 이동
-        className="mt-4 bg-gray-500 hover:bg-gray-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md"
+        onClick={() => router.push("/")}
+        className="mt-6 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md"
       >
-        ⬅ 뒤로가기
+        홈으로 돌아가기
       </button>
 
       {/* ✅ 사용자 목록 출력 + 선택 및 삭제 버튼 추가 */}
@@ -213,7 +230,7 @@ export default function Users() {
             {popupMessage && (
               <button
                 onClick={() => router.push("/records")}
-                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg mr-3"
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg mr-3"
               >
                 구매내역 보기
               </button>
@@ -221,7 +238,10 @@ export default function Users() {
 
             {/* ✅ 닫기 버튼 (결제 성공 후에도 표시) */}
             <button
-              onClick={() => setSelectedUser(null)}
+              onClick={() => {
+                setSelectedUser(null);
+                setPopupMessage(""); // ✅ 팝업 메시지 초기화
+              }}
               className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg"
             >
               닫기
@@ -259,9 +279,25 @@ export default function Users() {
       </div>
     )}
 
+  {/* ✅ 일반 메시지 팝업 (이름 입력, 오류 메시지 등) */}
+  {popupMessage && !selectedUser && !showDeletePopup && (
+    <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="bg-white p-6 rounded-lg shadow-md text-center">
+        <p className="text-lg font-semibold mb-4">{popupMessage}</p>
 
+        {/* ✅ 닫기 버튼 */}
+        <button
+          onClick={() => setPopupMessage("")} // ✅ 팝업 닫기
+          className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg"
+        >
+          닫기
+        </button>
+      </div>
     </div>
+  )}
 
-    
+
+
+    </div>    
   );
 }
