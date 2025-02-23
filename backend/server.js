@@ -69,22 +69,24 @@ app.post("/api/auth/generateToken", (req, res) => {
 
 // ✅ JWT 토큰 검증 엔드포인트
 app.get("/api/auth/validateToken", (req, res) => {
-  console.log("📌 받은 auth-token:", req.header("auth-token")); // 🔥 헤더 확인
+  const token = req.header("auth-token");
+  console.log("📌 받은 auth-token:", token); // ✅ 요청 헤더에서 받은 토큰 확인
+
+  if (!token) {
+    console.log("❌ 토큰이 없습니다!");
+    return res.status(401).json({ valid: false, error: "No token provided" });
+  }
 
   try {
-    const token = req.header("auth-token");
-    if (!token) {
-      console.log("❌ 토큰이 없습니다!");
-      return res.status(401).json({ error: "❌ 토큰이 없습니다." });
-    }
-
-    const verified = jwt.verify(token, jwtSecretKey);
-    return res.json({ message: "✅ 인증 성공", user: verified });
+    const verified = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    console.log("✅ 토큰 검증 성공:", verified);
+    res.json({ valid: true, user: verified });
   } catch (error) {
-    console.error("❌ 토큰 검증 실패:", error);
-    return res.status(401).json({ error: "유효하지 않은 토큰입니다." });
+    console.log("❌ 토큰 검증 실패:", error.message); // 🔥 실패 원인 확인
+    res.status(401).json({ valid: false, error: "Invalid token" });
   }
 });
+
 
 
 
