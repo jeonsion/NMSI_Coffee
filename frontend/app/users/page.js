@@ -93,16 +93,18 @@ export default function Users() {
 
   // ✅ 삭제 요청 실행
   const handleConfirmDelete = async () => {
-    if (!selectedRecord) return;
-  
-    console.log("삭제 요청하는 ID:", selectedRecord._id); // ✅ 디버깅용 로그
+    if (!selectedRecord || !selectedRecord._id) {
+      console.error("❌ 삭제할 사용자 ID가 없습니다.");
+      return;
+    }
   
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${selectedRecord._id}`, {
-        method: "DELETE",
-      });
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/users/${selectedRecord._id}`;
+      console.log("📌 삭제 요청 URL:", apiUrl);
   
-      console.log("서버 응답 상태 코드:", res.status); // ✅ 응답 상태 코드 출력
+      const res = await fetch(apiUrl, { method: "DELETE" });
+  
+      console.log("📌 서버 응답 상태 코드:", res.status);
   
       if (!res.ok) throw new Error("사용자 삭제 실패");
   
@@ -110,9 +112,10 @@ export default function Users() {
       setShowDeletePopup(false);
       setSelectedRecord(null);
     } catch (err) {
-      console.error("사용자 삭제 오류:", err);
+      console.error("❌ 사용자 삭제 오류:", err);
     }
   };
+    
   
   
     // ✅ 결제 기록 추가 (중복 검사 포함)

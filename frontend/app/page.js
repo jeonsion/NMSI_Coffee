@@ -3,43 +3,75 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { auth } from "@/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { destroyCookie } from "nookies";
+import { destroyCookie, parseCookies } from "nookies";
 
 export default function Home() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
-  const [autoLogin, setAutoLogin] = useState(false);
 
   const adminEmails = (process?.env?.NEXT_PUBLIC_ADMIN_EMAILS ?? "").split(",");
   const isAdmin = user?.email && adminEmails.includes(user.email);
 
+  // ✅ 자동 로그인 유지 및 토큰 검증 추가
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (!currentUser) {
+        console.warn("⚠️ 로그인 정보 없음, 로그아웃 처리");
         destroyCookie(null, "token");
         router.push("/login");
-      } else {
-        setUser(currentUser);
+        return;
       }
+
+      // ✅ 서버에서 토큰 검증 요청
+      try {
+        const cookies = parseCookies();
+        const token = cookies.token;
+        if (!token) {
+          console.warn("⚠️ 토큰 없음, 로그아웃 처리");
+          destroyCookie(null, "token");
+          router.push("/login");
+          return;
+        }
+
+        const response = await fetch("http://localhost:5001/api/auth/validateToken", {
+          method: "GET",
+          headers: { 
+            "Content-Type": "application/json",
+            "auth-token": token,
+          },
+        });
+
+        if (!response.ok) {
+          console.warn("⚠️ 유효하지 않은 토큰, 로그아웃 처리");
+          destroyCookie(null, "token");
+          router.push("/login");
+          return;
+        }
+
+        console.log("✅ 유효한 토큰 확인됨");
+        setUser(currentUser);
+      } catch (error) {
+        console.error("❌ 토큰 검증 실패:", error);
+        destroyCookie(null, "token");
+        router.push("/login");
+      }
+
       setLoading(false);
     });
+
     return () => unsubscribe();
   }, [router]);
 
-  const handleLogin = () => {
-    if (autoLogin) return;
-    setAutoLogin(true);
-    router.push("/login");
-  };
-
+  // ✅ 로그아웃 함수
   const handleLogout = async () => {
     try {
       await signOut(auth);
       destroyCookie(null, "token");
-      router.push("/login");
+      console.log("✅ 로그아웃 완료, 새로고침");
+      window.location.reload(); // 🚀 즉시 로그아웃 반영
     } catch (error) {
-      console.error("로그아웃 실패:", error);
+      console.error("❌ 로그아웃 실패:", error);
     }
   };
 

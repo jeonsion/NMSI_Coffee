@@ -11,8 +11,12 @@
   "dependencies": {
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
     "firebase": "^11.3.0",
     "firebase-admin": "^13.1.0",
+    "jest-fixed-jsdom": "^0.0.9",
+    "jsonwebtoken": "^9.0.2",
     "next": "15.1.6",
     "nookies": "^2.5.2",
     "react": "^19.0.0",
