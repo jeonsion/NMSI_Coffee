@@ -51,6 +51,8 @@ export default function Login() {
   // ✅ Google 로그인 → 백엔드에서 JWT 발급 요청
 const handleLogin = async () => {
   try {
+
+    
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" }); // ✅ 항상 계정 선택 창 띄우기
     const result = await signInWithPopup(auth, provider);
@@ -74,9 +76,15 @@ const handleLogin = async () => {
       body: JSON.stringify({ email: user.email }),
     });
 
+    
+
     const data = await response.json();
+    console.log("✅ 받은 토큰:", data.token); // ✅ 토큰이 제대로 오는지 확인
+
     if (response.ok) {
       setCookie(null, "token", data.token, { path: "/", maxAge: 3600 });
+      console.log("✅ 쿠키에 저장된 토큰:", document.cookie); // ✅ 저장 확인
+
       setIsLoggedIn(true);
       setAccessDenied(false);
       router.push("/");
@@ -84,7 +92,7 @@ const handleLogin = async () => {
       console.error("토큰 요청 실패:", data.error);
     }
   } catch (error) {
-    if (error.code === "auth/cancelled-popup-request" || error.code === "auth/popup-closed-by-user") {
+    if (error.code === "auth/cancelled-popup-request" || error.code === "auth/popup-closed-by-user" || error.message.includes("Cross-Origin-Opener-Policy")) {
       console.warn("⚠️ 로그인 팝업이 취소되었습니다. (무시 가능)");
       return;
     }

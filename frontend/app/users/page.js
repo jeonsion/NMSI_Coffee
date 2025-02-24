@@ -1,16 +1,66 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { destroyCookie } from "nookies";
 
 export default function Users() {
   const [users, setUsers] = useState([]);
   const [name, setName] = useState("");
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedRecord, setSelectedRecord] = useState(null); // ✅ 삭제용
   const [popupMessage, setPopupMessage] = useState(""); // ✅ 팝업 메시지 관리
   const [paymentSuccess, setPaymentSuccess] = useState(false); // ✅ 결제 성공 여부
   const [showDeletePopup, setShowDeletePopup] = useState(false); // ✅ 삭제 팝업 표시 여부
+
+
+  // ✅ 토큰 검사 (유효하지 않으면 로그인 페이지로 이동)
+  useLayoutEffect(() => {
+    async function checkToken() {
+      const token = document.cookie.replace(
+        /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
+        "$1"
+      );
+      console.log("📌 API 요청에 사용된 토큰:", token);
+  
+      if (!token) {
+        console.warn("🚨 토큰 없음 → 로그아웃 처리");
+        destroyCookie(null, "token");
+        router.push("/login");
+        return;
+      }
+  
+      try {
+        const res = await fetch("http://localhost:5001/api/auth/validateToken", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "auth-token": token,
+          },
+        });
+        const data = await res.json();
+        console.log("📌 백엔드 검증 응답:", data);
+  
+        if (!data || !data.valid) {
+          console.warn("🚨 유효하지 않은 토큰 → 로그아웃 처리");
+          destroyCookie(null, "token");
+          router.push("/login");
+        }
+        else{
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error("❌ 토큰 검증 실패:", error);
+        destroyCookie(null, "token");
+        router.push("/login");
+      }
+    }
+  
+    checkToken();
+  }, [router]);
+  
+  
 
 
   // ✅ API에서 사용자 목록 불러오기
@@ -149,7 +199,13 @@ export default function Users() {
       }
   };
   
-
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-lg font-bold text-gray-600">🔄 인증 확인 중...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white text-gray-800">
