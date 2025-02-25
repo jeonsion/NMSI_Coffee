@@ -8,7 +8,7 @@ const app = express();
 
 // ✅ 미들웨어 설정
 app.use(cors({
-  origin: "http://localhost:3000", // 프론트엔드 주소
+  origin: "*", // 프론트엔드 주소
   methods: ["GET", "POST", "PUT", "DELETE"], // DELETE 허용
   credentials: true, // 쿠키 허용
 }));

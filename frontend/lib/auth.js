@@ -1,5 +1,4 @@
 // lib/auth.js
-import { auth } from "@/firebase";
 import { getAuth } from "firebase-admin/auth";
 import { initializeApp, applicationDefault } from "firebase-admin/app";
 
