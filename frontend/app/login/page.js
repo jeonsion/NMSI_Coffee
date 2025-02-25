@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
-import { auth } from "@/app/firebase";
+import { auth } from "../firebase";
 import { setCookie, destroyCookie, parseCookies } from "nookies";
 
 export default function Login() {
