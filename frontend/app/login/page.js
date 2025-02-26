@@ -25,7 +25,7 @@ export default function Login() {
       }
 
       console.log("🔍 서버에 토큰 검증 요청:", token);
-      const response = await fetch("http://localhost:5001/api/auth/validateToken", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/validateToken`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -70,7 +70,7 @@ const handleLogin = async () => {
     }
 
     // ✅ JWT 토큰 요청 (백엔드)
-    const response = await fetch("http://localhost:5001/api/auth/generateToken", {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/generateToken`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: user.email }),

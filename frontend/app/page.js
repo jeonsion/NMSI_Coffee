@@ -33,8 +33,7 @@ export default function Home() {
           router.push("/login");
           return;
         }
-
-        const response = await fetch("http://localhost:5001/api/auth/validateToken", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/validateToken`, {
           method: "GET",
           headers: { 
             "Content-Type": "application/json",

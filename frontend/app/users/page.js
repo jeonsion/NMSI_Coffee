@@ -32,7 +32,7 @@ export default function Users() {
       }
   
       try {
-        const res = await fetch("http://localhost:5001/api/auth/validateToken", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/validateToken`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
