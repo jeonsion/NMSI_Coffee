@@ -27,6 +27,7 @@ export default function Home() {
       try {
         const cookies = parseCookies();
         const token = cookies.token;
+
         if (!token) {
           console.warn("⚠️ 토큰 없음, 로그아웃 처리");
           destroyCookie(null, "token");

@@ -65,7 +65,7 @@ export default function Records() {
   useEffect(() => {
     const fetchRecords = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/coffee`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/coffee/list`);
         const data = await res.json();
         setRecords(data);
       } catch (err) {

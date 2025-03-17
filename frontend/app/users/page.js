@@ -65,75 +65,57 @@ export default function Users() {
 
   // ✅ API에서 사용자 목록 불러오기
   useEffect(() => {
+    console.log("📌 사용자 목록 불러오기 요청 실행됨!");
     const fetchUsers = async () => {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`);
-        const data = await res.json();
-        setUsers(data);
-      } catch (err) {
-        console.error("사용자 목록 불러오기 오류:", err);
-      }
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/list`);
+            const data = await res.json();
+            setUsers(data);
+        } catch (err) {
+            console.error("사용자 목록 불러오기 오류:", err);
+        }
     };
 
     fetchUsers();
-  }, []);
+}, []); // ✅ 빈 배열을 추가해서 1회만 실행되도록 제한
+
 
   const isValidName = (name) => /^[A-Za-z가-힣\s]+$/.test(name);
 
 
   // ✅ 새로운 사용자 추가하기
-  const handleAddUser = async () => {
-    if (!name.trim()) {
-      setPopupMessage("이름을 입력하세요!"); // ✅ 팝업 메시지 설정
+const handleAddUser = async () => {
+  if (!name.trim()) {
+      setPopupMessage("이름을 입력하세요!");
       return;
-    }
+  }
 
-    if (!isValidName(name)) {
-      setPopupMessage(
-        <>
-          올바른 이름을 입력하세요! (한글 또는 영어만 가능)
-          <br />
-          ex) "이순신", "Kim Minseok"
-        </>
-      );
-            return;
-    }
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
+  if (!isValidName(name)) {
+      setPopupMessage("올바른 이름을 입력하세요! (한글 또는 영어만 가능)");
+      return;
+  }
+
+  try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/list`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name }),
       });
 
-      if (!res.ok) throw new Error("사용자 추가 실패");
+      console.log("📌 서버 응답 상태 코드:", res.status);
+      const responseData = await res.json();
+      console.log("📌 서버 응답 데이터:", responseData);
 
-      const newUser = await res.json();
-      setUsers([...users, newUser]); // ✅ 새 사용자 목록에 추가
-      setName(""); // 입력 필드 초기화
-    } catch (err) {
+      if (!res.ok) throw new Error(`사용자 추가 실패: ${responseData.error || "알 수 없는 오류"}`);
+
+      // ✅ 기존 users 배열을 유지하면서 새로운 사용자 추가
+      setUsers((prevUsers) => [...prevUsers, responseData]);
+      setName("");
+  } catch (err) {
       console.error("사용자 추가 오류:", err);
-      setPopupMessage("사용자 추가 중 오류가 발생했습니다.");
-    }
-  };
-  
-  // ✅ 사용자 삭제
-  const handleDeleteUser = async (userId) => {
-    if (!confirm("정말 삭제하시겠습니까?")) return;
-
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${userId}`, {
-        method: "DELETE",
-      });
-
-      if (!res.ok) throw new Error("사용자 삭제 실패");
-
-      setUsers(users.filter((user) => user._id !== userId)); // ✅ UI에서 즉시 삭제
-      setShowDeletePopup(false); // ✅ 삭제 후 팝업 닫기
-      setSelectedRecord(null);
-    } catch (err) {
-      console.error("사용자 삭제 오류:", err);
-    }
-  };
+      setPopupMessage(`사용자 추가 중 오류 발생: ${err.message}`);
+  }
+};
 
   const handleDeleteClick = (user) => {
     setSelectedRecord(user); // ✅ 삭제할 사용자 정보 저장
@@ -220,35 +202,36 @@ export default function Users() {
       </button>
 
       {/* ✅ 사용자 목록 출력 + 선택 및 삭제 버튼 추가 */}
-      <ul className="mt-6 w-full max-w-md">
-        {users.length > 0 ? (
-          users.map((user) => (
-            <li key={user._id} className="p-3 border-b border-gray-300 flex justify-between items-center">
-              <div className="flex gap-3">
-                <button
-                  onClick={() => {
-                    setSelectedUser(user)
-                    setPopupMessage(""); // ✅ 팝업 메시지 초기화
-                    setPaymentSuccess(false); // ✅ 성공 상태 초기화
-                  }}
-                  className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded"
-                >
-                  선택
-                </button>
-                <span>{user.name}</span>
-              </div>
+          <ul className="mt-6 w-full max-w-md">
+      {users.length > 0 ? (
+        users.map((user) => (
+          <li key={user._id || user.name} className="p-3 border-b border-gray-300 flex justify-between items-center">
+            <div className="flex gap-3">
               <button
-                onClick={() => handleDeleteClick(user)}
-                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                onClick={() => {
+                  setSelectedUser(user);
+                  setPopupMessage("");
+                  setPaymentSuccess(false);
+                }}
+                className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded"
               >
-                삭제
+                선택
               </button>
-            </li>
-          ))
-        ) : (
-          <p className="text-gray-500">등록된 사용자가 없습니다.</p>
-        )}
-      </ul>
+              <span>{user.name}</span>
+            </div>
+            <button
+              onClick={() => handleDeleteClick(user)}
+              className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+            >
+              삭제
+            </button>
+          </li>
+        ))
+      ) : (
+        <p className="text-gray-500">등록된 사용자가 없습니다.</p>
+      )}
+    </ul>
+
 
       {/* ✅ 사용자 추가 입력 폼 */}
       <div className="mt-6 flex">
