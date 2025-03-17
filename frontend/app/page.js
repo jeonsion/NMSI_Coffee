@@ -61,25 +61,13 @@ export default function Home() {
     return () => unsubscribe();
   }, [router]);
 
-
+  // ✅ `user` 값이 업데이트될 때마다 `isAdmin` 상태 업데이트
   useEffect(() => {
     if (user?.email) {
-      const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "").split(",");
+      const adminEmails = (process?.env?.NEXT_PUBLIC_ADMIN_EMAILS ?? "").split(",");
       setIsAdmin(adminEmails.includes(user.email));
     }
   }, [user]);
-  
-  // ✅ isAdmin이 null일 때는 버튼을 렌더링하지 않도록 변경
-  {user && isAdmin === false && (
-    <div className="mt-6 flex gap-4">
-      <button onClick={() => router.push("/users")} className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md">
-        커피 구매하기
-      </button>
-      <button onClick={() => router.push("/records")} className="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg shadow-md">
-        구매 기록 보기
-      </button>
-    </div>
-  )}
 
   // ✅ 로그아웃 함수
   const handleLogout = async () => {
