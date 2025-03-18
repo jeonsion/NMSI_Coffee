@@ -14,7 +14,10 @@
   }
 }
 
+/* Tailwind 클래스를 유지하면서 커스텀 스타일 적용 */
 body {
+  color: #1a202c; /* text-gray-900 */
+  background-color: #f7fafc; /* bg-gray-100 */
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;

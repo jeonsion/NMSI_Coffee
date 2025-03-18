@@ -89,7 +89,18 @@ export default function Home() {
       {user && <p className="text-md text-gray-500 mt-4">현재 로그인 계정: {user.email}</p>}
 
       {/* ✅ `user`가 설정될 때까지 버튼이 렌더링되지 않도록 수정 */}
-      {user && !isAdmin && (
+      {/* {user && !isAdmin && (
+        <div className="mt-6 flex gap-4">
+          <button onClick={() => router.push("/users")} className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md">
+            커피 구매하기
+          </button>
+          <button onClick={() => router.push("/records")} className="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg shadow-md">
+            구매 기록 보기
+          </button>
+        </div>
+      )} */}
+      {/* ✅ 로딩이 끝나고, 유저가 존재하며, 관리자가 아닐 때만 버튼 표시 */}
+      {!loading && user && !isAdmin && (
         <div className="mt-6 flex gap-4">
           <button onClick={() => router.push("/users")} className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md">
             커피 구매하기
@@ -99,6 +110,7 @@ export default function Home() {
           </button>
         </div>
       )}
+
 
       <button onClick={handleLogout} className="mt-6 bg-red-500 text-white px-6 py-3 rounded-lg">로그아웃</button>
     </div>
