@@ -62,12 +62,26 @@ export default function Home() {
   }, [router]);
 
   // ✅ `user` 값이 업데이트될 때마다 `isAdmin` 상태 업데이트
+  // useEffect(() => {
+  //   if (user?.email) {
+  //     const adminEmails = (process?.env?.NEXT_PUBLIC_ADMIN_EMAILS ?? "").split(",");
+  //     setIsAdmin(adminEmails.includes(user.email));
+  //   }
+  // }, [user]);
   useEffect(() => {
     if (user?.email) {
       const adminEmails = (process?.env?.NEXT_PUBLIC_ADMIN_EMAILS ?? "").split(",");
-      setIsAdmin(adminEmails.includes(user.email));
+      console.log("🔍 Admin Emails (배포 환경):", adminEmails);
+      console.log("🔍 Current User Email:", user.email);
+      
+      const isAdminUser = adminEmails.includes(user.email);
+      console.log("🔍 isAdmin 상태:", isAdminUser);
+  
+      setIsAdmin(isAdminUser);
     }
   }, [user]);
+  
+
 
   // ✅ 로그아웃 함수
   const handleLogout = async () => {
