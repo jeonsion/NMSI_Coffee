@@ -251,46 +251,51 @@ const handleAddUser = async () => {
       </div>
 
       {/* ✅ 결제 확인 팝업 */}
-      {selectedUser && (
-        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-md text-center">
-            <p className={`text-lg font-semibold mb-4 ${paymentSuccess ? "text-green-600" : "text-black"}`}>
-              {popupMessage || `${selectedUser.name} 님이 오늘 커피를 결제했습니까?`}
-            </p>
+{/* ✅ 결제 확인 팝업 */}
+{selectedUser && (
+  <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
+    <div className="bg-white p-6 rounded-lg shadow-md text-center">
+      <p className={`text-lg font-semibold mb-4 ${paymentSuccess ? "text-green-600" : "text-black"}`}>
+        {popupMessage || `${selectedUser.name} 님이 오늘 커피를 결제했습니까?`}
+      </p>
 
-            {/* ✅ 결제 성공 또는 중복 결제 시 "확인" 버튼 비활성화 */}
-            {!paymentSuccess && popupMessage === "" && (
-              <button
-                onClick={handleConfirmPayment}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg mr-3"
-              >
-                확인
-              </button>
-            )}
+      {/* ✅ 버튼을 감싸는 div 추가 (가로 정렬) */}
+      <div className="flex justify-center gap-4 mt-4">
+        {/* ✅ 결제 성공 또는 중복 결제 시 "확인" 버튼 비활성화 */}
+        {!paymentSuccess && popupMessage === "" && (
+          <button
+            onClick={handleConfirmPayment}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+          >
+            확인
+          </button>
+        )}
 
-            {/* ✅ 구매내역 보기 버튼 (결제 성공 또는 이미 결제된 경우에만 표시) */}
-            {popupMessage && (
-              <button
-                onClick={() => router.push("/records")}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg mr-3"
-              >
-                구매내역 보기
-              </button>
-            )}
+        {/* ✅ 구매내역 보기 버튼 (결제 성공 또는 이미 결제된 경우에만 표시) */}
+        {popupMessage && (
+          <button
+            onClick={() => router.push("/records")}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+          >
+            구매내역 보기
+          </button>
+        )}
 
-            {/* ✅ 닫기 버튼 (결제 성공 후에도 표시) */}
-            <button
-              onClick={() => {
-                setSelectedUser(null);
-                setPopupMessage(""); // ✅ 팝업 메시지 초기화
-              }}
-              className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg"
-            >
-              닫기
-            </button>
-          </div>
-        </div>
-      )}
+        {/* ✅ 닫기 버튼 (결제 성공 후에도 표시) */}
+        <button
+          onClick={() => {
+            setSelectedUser(null);
+            setPopupMessage(""); // ✅ 팝업 메시지 초기화
+          }}
+          className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg"
+        >
+          닫기
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 
     {/* ✅ 삭제 확인 팝업 */}
     {showDeletePopup && selectedRecord && (
